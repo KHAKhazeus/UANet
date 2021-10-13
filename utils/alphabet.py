@@ -13,7 +13,7 @@ import json
 import os
 import sys
 
-
+# 构建instance2index字典
 class Alphabet:
     def __init__(self, name, label=False, keep_growing=True):
         self.name = name

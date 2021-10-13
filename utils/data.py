@@ -171,27 +171,39 @@ class Data:
     def build_alphabet(self, input_file):
         in_lines = open(input_file,'r').readlines()
         for line in in_lines:
+            # 去除空行
             if len(line) > 2:
                 pairs = line.strip().split()
+                # 取出第一个字符
                 word = pairs[0]
+                # TODO: 这是什么意思
                 if sys.version_info[0] < 3:
                     word = word.decode('utf-8')
+                # TODO: 什么是number_normalized
                 if self.number_normalized:
                     word = normalize_word(word)
+                # 提取NER标签
                 label = pairs[-1]
+                # 加入字典，字典会自动去重
                 self.label_alphabet.add(label)
                 self.word_alphabet.add(word)
                 ## build feature alphabet
+                # TODO: 目前来看没有用
                 for idx in range(self.feature_num):
                     feat_idx = pairs[idx+1].split(']',1)[-1]
                     self.feature_alphabets[idx].add(feat_idx)
+                # 没有用
                 for char in word:
                     self.char_alphabet.add(char)
+        # 目前的字典大小统计
         self.word_alphabet_size = self.word_alphabet.size()
         self.char_alphabet_size = self.char_alphabet.size()
         self.label_alphabet_size = self.label_alphabet.size()
+        # TODO: 没有用
         for idx in range(self.feature_num):
             self.feature_alphabet_sizes[idx] = self.feature_alphabets[idx].size()
+        # 没有用
+        # TODO: 什么是tagScheme
         startS = False
         startB = False
         for label,_ in self.label_alphabet.iteritems():
@@ -205,7 +217,7 @@ class Data:
             else:
                 self.tagScheme = "BIO"
 
-
+    # 固定住字典，让字典看到新词汇的时候不再发生变动
     def fix_alphabet(self):
         self.word_alphabet.close()
         self.char_alphabet.close()
@@ -213,11 +225,12 @@ class Data:
         for idx in range(self.feature_num):
             self.feature_alphabets[idx].close()
 
-
+    # 读取Glove embedding
     def build_pretrain_emb(self):
         if self.word_emb_dir:
             print("Load pretrained word embedding, norm: %s, dir: %s"%(self.norm_word_emb, self.word_emb_dir))
             self.pretrain_word_embedding, self.word_emb_dim = build_pretrain_embedding(self.word_emb_dir, self.word_alphabet, self.word_emb_dim, self.norm_word_emb)
+        # TODO: 无用
         if self.char_emb_dir:
             print("Load pretrained char embedding, norm: %s, dir: %s"%(self.norm_char_emb, self.char_emb_dir))
             self.pretrain_char_embedding, self.char_emb_dim = build_pretrain_embedding(self.char_emb_dir, self.char_alphabet, self.char_emb_dim, self.norm_char_emb)
@@ -225,6 +238,7 @@ class Data:
             if self.feature_emb_dirs[idx]:
                 print("Load pretrained feature %s embedding:, norm: %s, dir: %s"%(self.feature_name[idx], self.norm_feature_embs[idx], self.feature_emb_dirs[idx]))
                 self.pretrain_feature_embeddings[idx], self.feature_emb_dims[idx] = build_pretrain_embedding(self.feature_emb_dirs[idx], self.feature_alphabets[idx], self.feature_emb_dims[idx], self.norm_feature_embs[idx])
+        # 无用
 
 
     def generate_instance(self, name):

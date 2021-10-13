@@ -21,7 +21,7 @@ except ImportError:
 
 import os
 
-
+# 数据进行初始化，提取并分析所有的字典
 def data_initialization(data):
     # data.initial_feature_alphabets()
     data.build_alphabet(data.train_dir)
@@ -399,6 +399,7 @@ if __name__ == '__main__':
     parser.add_argument('--model2_dropout', default=0.2)
     parser.add_argument('--attention_dropout', default=0.15)
 
+    # 默认不使用crf
     parser.add_argument('--use_crf', default=False)
 
     # optimizer
@@ -423,11 +424,13 @@ if __name__ == '__main__':
     torch.random.manual_seed(seed_num)
     torch.cuda.manual_seed_all(seed_num)
 
+    #构建数据
     data = Data()
     data.HP_gpu = torch.cuda.is_available()
 
     if args.status == 'train':
         print("MODE: train")
+        # 从args中读取data的设置
         data.read_config(args)
 
         import uuid
@@ -439,6 +442,7 @@ if __name__ == '__main__':
             os.mkdir(data.model_dir)
 
         data_initialization(data)
+        # 生成对应数据集
         data.generate_instance('train')
         data.generate_instance('dev')
         data.generate_instance('test')

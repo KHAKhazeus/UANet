@@ -17,12 +17,13 @@ def normalize_word(word):
             new_word += char
     return new_word
 
-
+# 读取数据
 def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, label_alphabet, number_normalized, max_sent_length, char_padding_size=-1, char_padding_symbol = '</pad>', dataset=None):
+    # TODO：无用，为零
     feature_num = len(feature_alphabets)
     in_lines = open(input_file,'r').readlines()
-    instence_texts = []
-    instence_Ids = []
+    instance_texts = []
+    instance_Ids = []
     words = []
     features = []
     chars = []
@@ -34,19 +35,22 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
     for line in in_lines:
         if len(line) > 2:
             pairs = line.strip().split() if dataset!='ccg' else line.strip().split("|||")
-
+            # python版本问题
             if sys.version_info[0] < 3:
                 word = pairs[0].decode('utf-8')
             else:
                 word = pairs[0]
 
+            # TODO: 无用，猜测为归一化数字信息
             if number_normalized:
                 word = normalize_word(word)
             label = pairs[-1] if dataset!='ccg' else pairs[1]
             words.append(word)
             labels.append(label)
+            # 取得对应id feature
             word_Ids.append(word_alphabet.get_index(word))
             label_Ids.append(label_alphabet.get_index(label))
+            # TODO: 无用
             ## get features
             feat_list = []
             feat_Id = []
@@ -56,11 +60,13 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
                 feat_Id.append(feature_alphabets[idx].get_index(feat_idx))
             features.append(feat_list)
             feature_Ids.append(feat_Id)
+            # 无用
             ## get char
             char_list = []
             char_Id = []
             for char in word:
                 char_list.append(char)
+            # TODO: 无用
             if char_padding_size > 0:
                 char_number = len(char_list)
                 if char_number < char_padding_size:
@@ -69,14 +75,17 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
             else:
                 ### not padding
                 pass
+            # 无用
             for char in char_list:
                 char_Id.append(char_alphabet.get_index(char))
             chars.append(char_list)
             char_Ids.append(char_Id)
         else:
+            # 按照语句进行拆分
+            # TODO: DOCSTART标记怎么办
             if (len(words) > 0) and ((max_sent_length < 0) or (len(words) < max_sent_length)) :
-                instence_texts.append([words, features, chars, labels])
-                instence_Ids.append([word_Ids, feature_Ids, char_Ids,label_Ids])
+                instance_texts.append([words, features, chars, labels])
+                instance_Ids.append([word_Ids, feature_Ids, char_Ids,label_Ids])
             words = []
             features = []
             chars = []
@@ -85,7 +94,7 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
             feature_Ids = []
             char_Ids = []
             label_Ids = []
-    return instence_texts, instence_Ids
+    return instance_texts, instance_Ids
 
 
 def build_pretrain_embedding(embedding_path, word_alphabet, embedd_dim=100, norm=True):
